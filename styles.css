@@ -1,6 +1,6 @@
 body {
-    background: #eef2ff;
     font-family: Arial;
+    background: #f0f0f0;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -10,44 +10,40 @@ body {
 .container {
     background: white;
     padding: 25px;
-    border-radius: 12px;
     width: 350px;
-    box-shadow: 0 0 12px rgba(0,0,0,0.15);
-    text-align: center;
-}
-
-input {
-    width: 90%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    margin-bottom: 12px;
-}
-
-button {
-    padding: 10px 20px;
-    background: #4a63ff;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-}
-
-button:hover {
-    background: #3a52db;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
 }
 
 .hidden {
     display: none;
 }
 
-table {
+button {
     width: 100%;
-    margin-top: 20px;
-    border-collapse: collapse;
+    padding: 10px;
+    font-size: 16px;
+    margin-top: 10px;
+    cursor: pointer;
 }
 
-th, td {
-    padding: 10px;
-    border: 1px solid #ccc;
+table {
+    width: 100%;
+    margin-top: 15px;
+}
+
+td, th {
+    padding: 8px;
+    border-bottom: 1px solid #ddd;
+    text-align: center;
+}
+
+.danger-btn {
+    background: red;
+    color: white;
+}
+
+.action-btn {
+    padding: 5px;
+    cursor: pointer;
 }
