@@ -7,30 +7,45 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-<div class="container">
-
-    <h2>Secret Santa</h2>
-
-    <!-- USER LOGIN -->
-    <div id="loginDiv">
-        <input type="text" id="email" placeholder="Enter Accenture Email">
-        <button onclick="processLogin()">Submit</button>
+    <!-- USER LOGIN PAGE -->
+    <div id="login-container" class="container">
+        <h2>Secret Santa Login</h2>
+        <input type="email" id="email" placeholder="Enter Accenture Email" required>
+        <button onclick="loginUser()">Login</button>
+        <p id="login-message"></p>
     </div>
 
-    <!-- ADMIN PANEL -->
-    <div id="adminDiv" class="hidden">
-        <h3>Admin Panel</h3>
-        <button onclick="resetAll()">Reset All Data</button>
-        <hr>
-        <table id="dataTable" border="1">
-            <tr><th>Email</th><th>Assigned Number</th></tr>
+    <!-- USER RESULT PAGE -->
+    <div id="user-result-container" class="container hidden">
+        <h2>Your Secret Santa Number</h2>
+        <h1 id="user-number"></h1>
+    </div>
+
+    <!-- ADMIN PAGE -->
+    <div id="admin-container" class="container hidden">
+        <h2>Admin Panel</h2>
+
+        <button class="danger-btn" onclick="resetAll()">Reset All</button>
+
+        <h3>Manually Add Entry</h3>
+        <input type="email" id="manual-email" placeholder="Enter Email">
+        <input type="number" id="manual-number" placeholder="Enter Number">
+        <button onclick="manualAdd()">Add</button>
+
+        <h3>All Assignments</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Email</th>
+                    <th>Number</th>
+                    <th>Edit</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody id="admin-table"></tbody>
         </table>
     </div>
 
-</div>
-
-<script src="script.js"></script>
-
+    <script src="script.js"></script>
 </body>
 </html>
