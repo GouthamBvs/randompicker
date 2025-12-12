@@ -1,51 +1,53 @@
-let totalNumbers = 17;
-let assignedNumbers = JSON.parse(localStorage.getItem("assigned") || "[]");
-let usedEmails = JSON.parse(localStorage.getItem("emails") || "[]");
-let tracking = JSON.parse(localStorage.getItem("tracking") || "[]");
-
-function saveData() {
-    localStorage.setItem("assigned", JSON.stringify(assignedNumbers));
-    localStorage.setItem("emails", JSON.stringify(usedEmails));
-    localStorage.setItem("tracking", JSON.stringify(tracking));
+body {
+    background: #eef2ff;
+    font-family: Arial;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
 }
 
-function loginAndPick() {
+.container {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    width: 350px;
+    box-shadow: 0 0 12px rgba(0,0,0,0.15);
+    text-align: center;
+}
 
-    let email = document.getElementById("email").value.trim().toLowerCase();
+input {
+    width: 90%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin-bottom: 12px;
+}
 
-    // Validate email domain
-    if (!email.endsWith("@accenture.com")) {
-        alert("❌ Only @accenture.com emails allowed!");
-        return;
-    }
+button {
+    padding: 10px 20px;
+    background: #4a63ff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
 
-    // Stop repeat attempts
-    if (usedEmails.includes(email)) {
-        alert("❌ You already picked your number!");
-        return;
-    }
+button:hover {
+    background: #3a52db;
+}
 
-    // Unique number selection
-    if (assignedNumbers.length >= totalNumbers) {
-        alert("All numbers assigned already.");
-        return;
-    }
+.hidden {
+    display: none;
+}
 
-    let number;
-    do {
-        number = Math.floor(Math.random() * totalNumbers) + 1;
-    } while (assignedNumbers.includes(number));
+table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+}
 
-    // Save assignment
-    usedEmails.push(email);
-    assignedNumbers.push(number);
-
-    tracking.push({ email: email, number: number });
-
-    saveData();
-
-    alert("🎁 Your Secret Santa number is: " + number);
-
-    document.getElementById("loginDiv").innerHTML =
-        "<h3>Thank you! Your number is assigned.</h3>";
+th, td {
+    padding: 10px;
+    border: 1px solid #ccc;
 }
