@@ -3,22 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secret Santa Picker</title>
+    <title>Secret Santa</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div class="container">
+<div class="container">
 
-        <h2>Secret Santa</h2>
+    <h2>Secret Santa</h2>
 
-        <div id="loginDiv">
-            <input type="text" id="email" placeholder="Enter your Accenture Email">
-            <button onclick="loginAndPick()">Submit</button>
-        </div>
-
+    <!-- USER LOGIN -->
+    <div id="loginDiv">
+        <input type="text" id="email" placeholder="Enter Accenture Email">
+        <button onclick="processLogin()">Submit</button>
     </div>
 
-    <script src="script.js"></script>
+    <!-- ADMIN PANEL -->
+    <div id="adminDiv" class="hidden">
+        <h3>Admin Panel</h3>
+        <button onclick="resetAll()">Reset All Data</button>
+        <hr>
+        <table id="dataTable" border="1">
+            <tr><th>Email</th><th>Assigned Number</th></tr>
+        </table>
+    </div>
+
+</div>
+
+<script src="script.js"></script>
+
 </body>
 </html>
