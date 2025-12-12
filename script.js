@@ -1,53 +1,91 @@
-body {
-    background: #eef2ff;
-    font-family: Arial;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+let totalNumbers = 17;
+
+let assigned = JSON.parse(localStorage.getItem("assigned") || "[]");
+let usedEmails = JSON.parse(localStorage.getItem("usedEmails") || "[]");
+let tracking = JSON.parse(localStorage.getItem("tracking") || "[]");
+
+const adminEmail = "admin@accenture.com"; // YOUR ADMIN LOGIN
+
+
+// SAVE DATA
+function saveData() {
+    localStorage.setItem("assigned", JSON.stringify(assigned));
+    localStorage.setItem("usedEmails", JSON.stringify(usedEmails));
+    localStorage.setItem("tracking", JSON.stringify(tracking));
 }
 
-.container {
-    background: white;
-    padding: 25px;
-    border-radius: 12px;
-    width: 350px;
-    box-shadow: 0 0 12px rgba(0,0,0,0.15);
-    text-align: center;
+
+// USER + ADMIN LOGIN PROCESS
+function processLogin() {
+
+    let email = document.getElementById("email").value.trim().toLowerCase();
+
+    // Admin Login
+    if (email === adminEmail) {
+        showAdminPanel();
+        return;
+    }
+
+    // Validate user email
+    if (!email.endsWith("@accenture.com")) {
+        alert("❌ Only @accenture.com emails allowed!");
+        return;
+    }
+
+    // Already logged user
+    if (usedEmails.includes(email)) {
+        let old = tracking.find(t => t.email === email);
+        alert("You already received your number: " + old.number);
+        return;
+    }
+
+    // Assign unique number
+    let number;
+    do {
+        number = Math.floor(Math.random() * totalNumbers) + 1;
+    } while (assigned.includes(number));
+
+    assigned.push(number);
+    usedEmails.push(email);
+    tracking.push({ email, number });
+    saveData();
+
+    alert("🎁 Your Secret Santa number is: " + number);
+
+    document.getElementById("loginDiv").innerHTML =
+        "<h3>Your number is assigned!</h3>";
 }
 
-input {
-    width: 90%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    margin-bottom: 12px;
+
+// ADMIN PANEL LOADING
+function showAdminPanel() {
+    document.getElementById("loginDiv").classList.add("hidden");
+    document.getElementById("adminDiv").classList.remove("hidden");
+
+    let table = document.getElementById("dataTable");
+
+    table.innerHTML = "<tr><th>Email</th><th>Number</th></tr>";
+
+    tracking.forEach(row => {
+        table.innerHTML += `<tr><td>${row.email}</td><td>${row.number}</td></tr>`;
+    });
 }
 
-button {
-    padding: 10px 20px;
-    background: #4a63ff;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-}
 
-button:hover {
-    background: #3a52db;
-}
+// RESET BUTTON
+function resetAll() {
+    if (!confirm("Do you really want to RESET all data?")) return;
 
-.hidden {
-    display: none;
-}
+    localStorage.removeItem("assigned");
+    localStorage.removeItem("usedEmails");
+    localStorage.removeItem("tracking");
 
-table {
-    width: 100%;
-    margin-top: 20px;
-    border-collapse: collapse;
-}
+    assigned = [];
+    usedEmails = [];
+    tracking = [];
 
-th, td {
-    padding: 10px;
-    border: 1px solid #ccc;
+    alert("All Data Reset Successful!");
+
+    // Reload admin table
+    showAdminPanel();
 }
