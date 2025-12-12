@@ -1,91 +1,125 @@
 let totalNumbers = 17;
 
-let assigned = JSON.parse(localStorage.getItem("assigned") || "[]");
-let usedEmails = JSON.parse(localStorage.getItem("usedEmails") || "[]");
-let tracking = JSON.parse(localStorage.getItem("tracking") || "[]");
-
-const adminEmail = "admin@accenture.com"; // YOUR ADMIN LOGIN
-
-
-// SAVE DATA
-function saveData() {
-    localStorage.setItem("assigned", JSON.stringify(assigned));
-    localStorage.setItem("usedEmails", JSON.stringify(usedEmails));
-    localStorage.setItem("tracking", JSON.stringify(tracking));
+function loadData() {
+    return JSON.parse(localStorage.getItem("santaData") || "{}");
 }
 
+function saveData(data) {
+    localStorage.setItem("santaData", JSON.stringify(data));
+}
 
-// USER + ADMIN LOGIN PROCESS
-function processLogin() {
-
+function loginUser() {
     let email = document.getElementById("email").value.trim().toLowerCase();
 
-    // Admin Login
-    if (email === adminEmail) {
-        showAdminPanel();
-        return;
-    }
-
-    // Validate user email
     if (!email.endsWith("@accenture.com")) {
-        alert("❌ Only @accenture.com emails allowed!");
+        document.getElementById("login-message").innerText = "Only Accenture emails allowed!";
         return;
     }
 
-    // Already logged user
-    if (usedEmails.includes(email)) {
-        let old = tracking.find(t => t.email === email);
-        alert("You already received your number: " + old.number);
+    if (email === "admin@accenture.com") {
+        showAdmin();
         return;
     }
 
-    // Assign unique number
-    let number;
-    do {
-        number = Math.floor(Math.random() * totalNumbers) + 1;
-    } while (assigned.includes(number));
+    let data = loadData();
 
-    assigned.push(number);
-    usedEmails.push(email);
-    tracking.push({ email, number });
-    saveData();
+    if (data[email]) {
+        showUserResult(data[email]);
+        return;
+    }
 
-    alert("🎁 Your Secret Santa number is: " + number);
-
-    document.getElementById("loginDiv").innerHTML =
-        "<h3>Your number is assigned!</h3>";
+    let assigned = assignNumber(data);
+    data[email] = assigned;
+    saveData(data);
+    showUserResult(assigned);
 }
 
+function assignNumber(data) {
+    let used = Object.values(data);
+    let available = [];
 
-// ADMIN PANEL LOADING
-function showAdminPanel() {
-    document.getElementById("loginDiv").classList.add("hidden");
-    document.getElementById("adminDiv").classList.remove("hidden");
+    for (let i = 1; i <= totalNumbers; i++) {
+        if (!used.includes(i)) available.push(i);
+    }
 
-    let table = document.getElementById("dataTable");
-
-    table.innerHTML = "<tr><th>Email</th><th>Number</th></tr>";
-
-    tracking.forEach(row => {
-        table.innerHTML += `<tr><td>${row.email}</td><td>${row.number}</td></tr>`;
-    });
+    return available[Math.floor(Math.random() * available.length)];
 }
 
+function showUserResult(number) {
+    document.getElementById("login-container").classList.add("hidden");
+    document.getElementById("user-result-container").classList.remove("hidden");
+    document.getElementById("user-number").innerText = number;
+}
 
-// RESET BUTTON
+function showAdmin() {
+    document.getElementById("login-container").classList.add("hidden");
+    document.getElementById("admin-container").classList.remove("hidden");
+    loadAdminTable();
+}
+
+function loadAdminTable() {
+    let data = loadData();
+    let table = document.getElementById("admin-table");
+    table.innerHTML = "";
+
+    for (let email in data) {
+        table.innerHTML += `
+            <tr>
+                <td>${email}</td>
+                <td>${data[email]}</td>
+                <td><button class="action-btn" onclick="editEntry('${email}')">Edit</button></td>
+                <td><button class="action-btn" onclick="deleteEntry('${email}')">Delete</button></td>
+            </tr>
+        `;
+    }
+}
+
+function editEntry(email) {
+    let data = loadData();
+    let newNumber = prompt("Enter new number:", data[email]);
+
+    if (!newNumber) return;
+    newNumber = parseInt(newNumber);
+
+    if (newNumber < 1 || newNumber > totalNumbers) {
+        alert("Invalid number!");
+        return;
+    }
+
+    data[email] = newNumber;
+    saveData(data);
+    loadAdminTable();
+}
+
+function deleteEntry(email) {
+    let data = loadData();
+    delete data[email];
+    saveData(data);
+    loadAdminTable();
+}
+
+function manualAdd() {
+    let email = document.getElementById("manual-email").value.trim().toLowerCase();
+    let number = parseInt(document.getElementById("manual-number").value);
+
+    if (!email.endsWith("@accenture.com")) {
+        alert("Invalid email!");
+        return;
+    }
+
+    if (number < 1 || number > totalNumbers) {
+        alert("Invalid number!");
+        return;
+    }
+
+    let data = loadData();
+    data[email] = number;
+    saveData(data);
+    loadAdminTable();
+}
+
 function resetAll() {
-    if (!confirm("Do you really want to RESET all data?")) return;
-
-    localStorage.removeItem("assigned");
-    localStorage.removeItem("usedEmails");
-    localStorage.removeItem("tracking");
-
-    assigned = [];
-    usedEmails = [];
-    tracking = [];
-
-    alert("All Data Reset Successful!");
-
-    // Reload admin table
-    showAdminPanel();
+    if (!confirm("Are you sure you want to reset everything?")) return;
+    localStorage.removeItem("santaData");
+    loadAdminTable();
 }
