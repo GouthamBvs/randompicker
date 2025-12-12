@@ -1,19 +1,18 @@
 body {
-    font-family: Arial, sans-serif;
     background: #eef2ff;
+    font-family: Arial;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
-    margin: 0;
 }
 
 .container {
     background: white;
     padding: 25px;
     border-radius: 12px;
-    width: 330px;
-    box-shadow: 0px 0px 12px rgba(0,0,0,0.15);
+    width: 350px;
+    box-shadow: 0 0 12px rgba(0,0,0,0.15);
     text-align: center;
 }
 
@@ -38,11 +37,17 @@ button:hover {
     background: #3a52db;
 }
 
+.hidden {
+    display: none;
+}
+
 table {
     width: 100%;
     margin-top: 20px;
+    border-collapse: collapse;
 }
 
 th, td {
     padding: 10px;
+    border: 1px solid #ccc;
 }
