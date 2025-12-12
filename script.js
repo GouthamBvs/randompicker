@@ -1,31 +1,33 @@
 let totalNumbers = 17;
 let assignedNumbers = JSON.parse(localStorage.getItem("assigned") || "[]");
 let usedEmails = JSON.parse(localStorage.getItem("emails") || "[]");
+let tracking = JSON.parse(localStorage.getItem("tracking") || "[]");
 
 function saveData() {
     localStorage.setItem("assigned", JSON.stringify(assignedNumbers));
     localStorage.setItem("emails", JSON.stringify(usedEmails));
+    localStorage.setItem("tracking", JSON.stringify(tracking));
 }
 
 function loginAndPick() {
 
     let email = document.getElementById("email").value.trim().toLowerCase();
 
-    // Validate email
+    // Validate email domain
     if (!email.endsWith("@accenture.com")) {
-        alert("❌ Only @accenture.com emails are allowed!");
+        alert("❌ Only @accenture.com emails allowed!");
         return;
     }
 
-    // Check repeated attempt
+    // Stop repeat attempts
     if (usedEmails.includes(email)) {
-        alert("❌ You have already picked your Secret Santa number!");
+        alert("❌ You already picked your number!");
         return;
     }
 
-    // Pick unique number
+    // Unique number selection
     if (assignedNumbers.length >= totalNumbers) {
-        alert("All numbers have already been assigned.");
+        alert("All numbers assigned already.");
         return;
     }
 
@@ -34,12 +36,14 @@ function loginAndPick() {
         number = Math.floor(Math.random() * totalNumbers) + 1;
     } while (assignedNumbers.includes(number));
 
-    // Save
+    // Save assignment
     usedEmails.push(email);
     assignedNumbers.push(number);
+
+    tracking.push({ email: email, number: number });
+
     saveData();
 
-    // Show result
     alert("🎁 Your Secret Santa number is: " + number);
 
     document.getElementById("loginDiv").innerHTML =
