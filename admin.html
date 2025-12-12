@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secret Santa Admin</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container">
+    <h2>Secret Santa - Admin Panel</h2>
+    <div id="adminData"></div>
+</div>
+
+<script>
+    const SECRET_KEY = "ACC123";
+
+    // check key
+    const urlParams = new URLSearchParams(window.location.search);
+    const key = urlParams.get("key");
+
+    if (key !== SECRET_KEY) {
+        document.body.innerHTML = "<h2 style='color:red; text-align:center;'>Unauthorized Access!</h2>";
+    } else {
+        let data = JSON.parse(localStorage.getItem("tracking") || "[]");
+
+        let html = "<table border='1' style='width:100%; border-collapse:collapse;'>";
+        html += "<tr><th>Email</th><th>Assigned Number</th></tr>";
+
+        data.forEach(row => {
+            html += `<tr><td>${row.email}</td><td>${row.number}</td></tr>`;
+        });
+
+        html += "</table>";
+
+        document.getElementById("adminData").innerHTML = html;
+    }
+</script>
+
+</body>
+</html>
