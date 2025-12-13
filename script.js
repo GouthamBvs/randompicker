@@ -1,125 +1,201 @@
-let totalNumbers = 17;
+let editId = null;
+let loggedUser = null;
 
-function loadData() {
-    return JSON.parse(localStorage.getItem("santaData") || "{}");
+const $ = id => document.getElementById(id);
+
+function getData() {
+  return JSON.parse(localStorage.getItem("santa") || "[]");
+}
+function setData(d) {
+  localStorage.setItem("santa", JSON.stringify(d));
 }
 
-function saveData(data) {
-    localStorage.setItem("santaData", JSON.stringify(data));
+/* LOGIN */
+function login() {
+  const email = $("loginEmail").value.trim().toLowerCase();
+  if (!email) return alert("Enter email");
+
+  if (email === "admin@accenture.com") {
+    $("loginCard").classList.add("hidden");
+    $("adminCard").classList.remove("hidden");
+    render();
+    return;
+  }
+
+  const user = getData().find(x => x.accentureEmail === email);
+  if (!user) return alert("Not registered");
+
+  loggedUser = user;
+  $("loginCard").classList.add("hidden");
+  $("userCard").classList.remove("hidden");
+  $("userAssigned").innerText = user.assignedTo || "Not Assigned";
 }
 
-function loginUser() {
-    let email = document.getElementById("email").value.trim().toLowerCase();
+/* USER DETAILS */
+function showMainDetails() {
+  $("paidMsg").innerHTML = "";
 
-    if (!email.endsWith("@accenture.com")) {
-        document.getElementById("login-message").innerText = "Only Accenture emails allowed!";
-        return;
-    }
+  if (!loggedUser.assignedTo) {
+    $("mainDetails").innerHTML = "<p>No assignment yet</p>";
+    return;
+  }
 
-    if (email === "admin@accenture.com") {
-        showAdmin();
-        return;
-    }
+  const p = getData().find(x => x.id === loggedUser.assignedTo);
+  if (!p) return;
 
-    let data = loadData();
-
-    if (data[email]) {
-        showUserResult(data[email]);
-        return;
-    }
-
-    let assigned = assignNumber(data);
-    data[email] = assigned;
-    saveData(data);
-    showUserResult(assigned);
+  $("mainDetails").innerHTML = `
+    <p><b>Name:</b> ${p.name}</p>
+    <p><b>Email:</b> ${p.accentureEmail}</p>
+    <p><b>Office:</b> ${p.location}</p>
+    <p><b>Gift:</b> ${p.category}</p>
+    <p><b>Preference:</b> ${p.preference}</p>
+    <p><b>Mode:</b> ${p.mode}</p>
+  `;
 }
 
-function assignNumber(data) {
-    let used = Object.values(data);
-    let available = [];
+function showPaidMessage() {
+  const d = getData();
+  const u = d.find(x => x.id === loggedUser.id);
+  u.paidClick = true;
+  setData(d);
 
-    for (let i = 1; i <= totalNumbers; i++) {
-        if (!used.includes(i)) available.push(i);
-    }
-
-    return available[Math.floor(Math.random() * available.length)];
+  const p = d.find(x => x.id === loggedUser.assignedTo);
+  $("paidMsg").innerHTML = `
+  
+    Wellcome to the curiosity board!!! 🤣🤣 I know you will come😅.... so to see the others DETAILS 💰 Pay 100 Rs ( Fully Commercial!!! with help of this i'll buy a gift to my assigned person😁😁)... sorry to say your already catched!!!😁😛<br>
+  `;
+  renderPaid();
 }
 
-function showUserResult(number) {
-    document.getElementById("login-container").classList.add("hidden");
-    document.getElementById("user-result-container").classList.remove("hidden");
-    document.getElementById("user-number").innerText = number;
+/* ADMIN SAVE */
+function save() {
+  const d = getData();
+  const name = $("name").value.trim();
+  const accEmail = $("accentureEmail").value.trim().toLowerCase();
+
+  if (!name || !accEmail)
+    return alert("Name & Accenture email required");
+
+  if (editId === null) {
+    d.push({
+      id: d.length + 1,
+      name,
+      personalEmail: $("personalEmail").value,
+      accentureEmail: accEmail,
+      location: $("location").value,
+      category: $("category").value,
+      preference: $("preference").value,
+      mode: $("mode").value,
+      assignedTo: $("manualAssign").value ? Number($("manualAssign").value) : "",
+      extra: $("extra").value,
+      address: $("address").value,
+      paidClick: false
+    });
+  } else {
+    const p = d.find(x => x.id === editId);
+    p.name = name;
+    p.personalEmail = $("personalEmail").value;
+    p.accentureEmail = accEmail;
+    p.location = $("location").value;
+    p.category = $("category").value;
+    p.preference = $("preference").value;
+    p.mode = $("mode").value;
+    if ($("manualAssign").value) p.assignedTo = Number($("manualAssign").value);
+    p.extra = $("extra").value;
+    p.address = $("address").value;
+  }
+
+  setData(d);
+  clearForm();
+  render();
 }
 
-function showAdmin() {
-    document.getElementById("login-container").classList.add("hidden");
-    document.getElementById("admin-container").classList.remove("hidden");
-    loadAdminTable();
+/* AUTO ASSIGN */
+function assignSanta() {
+  let d = getData();
+  if (d.length < 2) {
+    alert("At least 2 participants required");
+    return;
+  }
+
+  let ids = d.map(p => p.id);
+  let assigned = [];
+
+  // keep shuffling until no one gets themselves
+  do {
+    assigned = [...ids].sort(() => Math.random() - 0.5);
+  } while (assigned.some((id, i) => id === ids[i]));
+
+  d.forEach((p, i) => {
+    p.assignedTo = assigned[i] || "";
+  });
+
+  setData(d);
+  render();
 }
 
-function loadAdminTable() {
-    let data = loadData();
-    let table = document.getElementById("admin-table");
-    table.innerHTML = "";
 
-    for (let email in data) {
-        table.innerHTML += `
-            <tr>
-                <td>${email}</td>
-                <td>${data[email]}</td>
-                <td><button class="action-btn" onclick="editEntry('${email}')">Edit</button></td>
-                <td><button class="action-btn" onclick="deleteEntry('${email}')">Delete</button></td>
-            </tr>
-        `;
-    }
+/* RENDER */
+function render() {
+  $("list").innerHTML = "";
+  getData().forEach(p => {
+    $("list").innerHTML += `
+      <tr>
+        <td>${p.id}</td>
+        <td>${p.name}</td>
+        <td>${p.accentureEmail}</td>
+        <td>${p.assignedTo || "Blank"}</td>
+        <td><button onclick="edit(${p.id})">Edit</button></td>
+        <td><button onclick="del(${p.id})">Delete</button></td>
+      </tr>`;
+  });
+  renderPaid();
 }
 
-function editEntry(email) {
-    let data = loadData();
-    let newNumber = prompt("Enter new number:", data[email]);
-
-    if (!newNumber) return;
-    newNumber = parseInt(newNumber);
-
-    if (newNumber < 1 || newNumber > totalNumbers) {
-        alert("Invalid number!");
-        return;
-    }
-
-    data[email] = newNumber;
-    saveData(data);
-    loadAdminTable();
+function renderPaid() {
+  $("paidList").innerHTML = "";
+  getData().filter(x => x.paidClick).forEach(p => {
+    $("paidList").innerHTML += `<tr><td>${p.accentureEmail}</td></tr>`;
+  });
 }
 
-function deleteEntry(email) {
-    let data = loadData();
-    delete data[email];
-    saveData(data);
-    loadAdminTable();
+/* EDIT */
+function edit(id) {
+  const p = getData().find(x => x.id === id);
+  editId = id;
+
+  $("pid").value = p.id;
+  $("name").value = p.name;
+  $("personalEmail").value = p.personalEmail;
+  $("accentureEmail").value = p.accentureEmail;
+  $("location").value = p.location;
+  $("category").value = p.category;
+  $("preference").value = p.preference;
+  $("mode").value = p.mode;
+  $("manualAssign").value = p.assignedTo;
+  $("extra").value = p.extra;
+  $("address").value = p.address;
 }
 
-function manualAdd() {
-    let email = document.getElementById("manual-email").value.trim().toLowerCase();
-    let number = parseInt(document.getElementById("manual-number").value);
-
-    if (!email.endsWith("@accenture.com")) {
-        alert("Invalid email!");
-        return;
-    }
-
-    if (number < 1 || number > totalNumbers) {
-        alert("Invalid number!");
-        return;
-    }
-
-    let data = loadData();
-    data[email] = number;
-    saveData(data);
-    loadAdminTable();
+/* DELETE */
+function del(id) {
+  let d = getData().filter(x => x.id !== id);
+  d.forEach((x, i) => x.id = i + 1);
+  setData(d);
+  render();
 }
 
+/* RESET */
 function resetAll() {
-    if (!confirm("Are you sure you want to reset everything?")) return;
-    localStorage.removeItem("santaData");
-    loadAdminTable();
+  if (confirm("Reset all data?")) {
+    localStorage.clear();
+    location.reload();
+  }
+}
+
+function clearForm() {
+  editId = null;
+  ["pid","name","personalEmail","accentureEmail","location",
+   "category","preference","mode","manualAssign","extra","address"]
+   .forEach(i => $(i).value = "");
 }
