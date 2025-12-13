@@ -1,51 +1,68 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secret Santa</title>
-    <link rel="stylesheet" href="styles.css">
+  <title>Secret Santa</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- USER LOGIN PAGE -->
-    <div id="login-container" class="container">
-        <h2>Secret Santa Login</h2>
-        <input type="email" id="email" placeholder="Enter Accenture Email" required>
-        <button onclick="loginUser()">Login</button>
-        <p id="login-message"></p>
-    </div>
 
-    <!-- USER RESULT PAGE -->
-    <div id="user-result-container" class="container hidden">
-        <h2>Your Secret Santa Number</h2>
-        <h1 id="user-number"></h1>
-    </div>
+<!-- LOGIN -->
+<div class="card" id="loginCard">
+  <h2>Secret Santa Login 🎉</h2>
+  <input id="loginEmail" placeholder="Enter Accenture Email">
+  <button onclick="login()">Login</button>
+</div>
 
-    <!-- ADMIN PAGE -->
-    <div id="admin-container" class="container hidden">
-        <h2>Admin Panel</h2>
+<!-- USER -->
+<div class="card hidden" id="userCard">
+  <h2>Your Secret Santa Assignment</h2>
+  <p><b>Assigned Number:</b> <span id="userAssigned"></span></p>
 
-        <button class="danger-btn" onclick="resetAll()">Reset All</button>
+  <button onclick="showMainDetails()">See Your Assigned Secret Santa Details</button>
+  <button class="secondary" onclick="showPaidMessage()">Do you want to see other details?</button>
 
-        <h3>Manually Add Entry</h3>
-        <input type="email" id="manual-email" placeholder="Enter Email">
-        <input type="number" id="manual-number" placeholder="Enter Number">
-        <button onclick="manualAdd()">Add</button>
+  <div id="mainDetails"></div>
+  <div id="paidMsg"></div>
+</div>
 
-        <h3>All Assignments</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Email</th>
-                    <th>Number</th>
-                    <th>Edit</th>
-                    <th>Delete</th>
-                </tr>
-            </thead>
-            <tbody id="admin-table"></tbody>
-        </table>
-    </div>
+<!-- ADMIN -->
+<div class="card hidden" id="adminCard">
+  <h2>Admin Panel</h2>
 
-    <script src="script.js"></script>
+  <button class="danger" onclick="resetAll()">Reset All</button>
+  <button onclick="assignSanta()">Auto Assign Secret Santa</button>
+
+  <h3>Add / Edit Participant</h3>
+  <input id="pid" placeholder="ID" disabled>
+  <input id="name" placeholder="Name">
+  <input id="personalEmail" placeholder="Personal Email">
+  <input id="accentureEmail" placeholder="Accenture Email">
+  <input id="location" placeholder="Office Location">
+  <input id="category" placeholder="Gift Category">
+  <input id="preference" placeholder="Gift Preference">
+  <input id="mode" placeholder="Online / Offline">
+  <input id="manualAssign" placeholder="Assigned To (manual ID)">
+  <textarea id="extra" placeholder="Extra Info"></textarea>
+  <textarea id="address" placeholder="Address"></textarea>
+
+  <button onclick="save()">Save</button>
+
+  <h3>Participants & Assignments</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th><th>Name</th><th>Email</th><th>Assigned To</th><th>Edit</th><th>Delete</th>
+      </tr>
+    </thead>
+    <tbody id="list"></tbody>
+  </table>
+
+  <h3>Paid Click Tracking</h3>
+  <table>
+    <tbody id="paidList"></tbody>
+  </table>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
